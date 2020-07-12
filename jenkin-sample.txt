@@ -1,0 +1,16 @@
+node {
+    stage ('Prepare environment') {
+        git branch: 'master', url: 'https://username:password@gitlab.com/your_username/your_repo.git'
+    }
+    stage ('Code Setup') {
+        sh 'cp .env.test .env'
+        sh 'composer install'
+        sh 'php artisan key:generate'
+    }
+    stage ('Unit test') {
+        sh 'php artisan test'
+    }
+    stage ('Deploy') {
+        sh 'ssh -oStrictHostKeyChecking=no root@192.168.161.135 "cd /var/www/app;git reset --hard;git pull origin master;composer install; chmod -R 777 storage;"'
+    }
+}
